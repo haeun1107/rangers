@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout code
+      - name: checkout
         uses: actions/checkout@v3
 
       - name: Set up JDK 17
@@ -21,83 +21,41 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: Make application-database.yaml
+      ## create application-database.yaml
+      - name: make application-database.yaml
         run: |
+          ## create application-database.yaml
           cd ./src/main/resources
+          
+          # application-database.yaml 파일 생성
           touch ./application-database.yaml
+          
+          # GitHub-Actions 에서 설정한 값을 application-database.yaml 파일에 쓰기
           echo "${{ secrets.DATABASE }}" >> ./application-database.yaml
         shell: bash
 
+      ## gradle build
       - name: Build with Gradle
         run: ./gradlew bootJar
 
-      - name: Docker login
+
+      ## 웹 이미지 빌드 및 도커허브에 push
+      - name: web docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_REPO }}/rangers .
+          docker push ${{ secrets.DOCKER_REPO }}/rangers
 
-      - name: Build and push web image
-        run: |
-          docker build -t ${{ secrets.DOCKER_REPO }}/rangers:latest .
-          docker push ${{ secrets.DOCKER_REPO }}/rangers:latest
-
-      - name: Determine active environment and deploy
+      ## docker compose up
+      - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ubuntu
           key: ${{ secrets.KEY }}
           script: |
-            # Determine which environment is currently active
-            ACTIVE_ENV=$(curl -s http://localhost/active || echo "Blue")  # 기본값으로 Blue 설정
-            echo "Currently active environment: $ACTIVE_ENV"
-
-            # Decide which environment to deploy to
-            if [ "$ACTIVE_ENV" == "Green" ]; then
-              TARGET_ENV="Blue"
-              TARGET_CONTAINER="web_blue"
-              TARGET_PORT="8081"
-            else
-              TARGET_ENV="Green"
-              TARGET_CONTAINER="web_green"
-              TARGET_PORT="8082"
-            fi
-
-            echo "Deploying to $TARGET_ENV environment..."
-
-            # Pull the latest image for the target environment and bring it up
-            sudo docker-compose pull $TARGET_CONTAINER
-            sudo docker-compose up -d $TARGET_CONTAINER
-
-            # Update nginx configuration by copying the appropriate config file
-            if [ "$TARGET_ENV" == "Green" ]; then
-              sudo cp /etc/nginx/conf.d/nginx-green.conf /etc/nginx/conf.d/nginx.conf
-            else
-              sudo cp /etc/nginx/conf.d/nginx-blue.conf /etc/nginx/conf.d/nginx.conf
-            fi
-
-            # Reload nginx to apply the new configuration
-            sudo docker exec nginx nginx -s reload
-
-      - name: Health Check for Deployment
-        run: |
-          sleep 10  # Give it some time to start
-          DEPLOYMENT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$TARGET_PORT/health)
-          if [ "$DEPLOYMENT_STATUS" != "200" ]; then
-            echo "Deployment failed, rolling back to previous environment"
-            ssh -i ${{ secrets.KEY }} ubuntu@${{ secrets.HOST }} << EOF
-              sudo docker-compose down $TARGET_CONTAINER
-              sudo docker exec nginx nginx -s reload
-            EOF
-            exit 1
-          else
-            echo "Deployment successful"
-          fi
-
-      - name: Cleanup unused Docker images
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ubuntu
-          key: ${{ secrets.KEY }}
-          script: |
+            sudo docker rm -f $(docker ps -qa)
+            sudo docker pull ${{ secrets.DOCKER_REPO }}/rangers
+            sudo docker pull ${{ secrets.DOCKER_REPO }}/rangers-nginx
+            sudo docker-compose up -d
             sudo docker image prune -f

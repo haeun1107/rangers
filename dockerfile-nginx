@@ -1,4 +1,2 @@
 FROM nginx
-
-COPY ./nginx/conf.d/nginx-blue.conf /etc/nginx/conf.d/nginx-blue.conf
-COPY ./nginx/conf.d/nginx-green.conf /etc/nginx/conf.d/nginx-green.conf
+COPY ./nginx/conf.d/nginx.conf /etc/nginx/conf.d
