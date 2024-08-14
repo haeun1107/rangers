@@ -40,9 +40,6 @@ jobs:
           docker build -t ${{ secrets.DOCKER_REPO }}/rangers:latest .
           docker push ${{ secrets.DOCKER_REPO }}/rangers:latest
 
-      - name: Copy docker-compose file to EC2
-        run: scp -o StrictHostKeyChecking=no -i ${{ secrets.KEY }} docker-compose.yaml ubuntu@${{ secrets.HOST }}:/home/ubuntu/docker-compose.yaml
-
       - name: Determine active environment and deploy
         uses: appleboy/ssh-action@master
         with:
