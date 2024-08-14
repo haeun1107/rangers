@@ -1,3 +1,4 @@
-FROM arm64v8/nginx
+FROM nginx
 
-COPY ./nginx/conf.d/nginx.conf /etc/nginx/conf.d/
+COPY ./nginx/conf.d/nginx-blue.conf /etc/nginx/conf.d/nginx-blue.conf
+COPY ./nginx/conf.d/nginx-green.conf /etc/nginx/conf.d/nginx-green.conf

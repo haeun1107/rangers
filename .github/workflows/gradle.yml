@@ -48,7 +48,7 @@ jobs:
           key: ${{ secrets.KEY }}
           script: |
             # Determine which environment is currently active
-            ACTIVE_ENV=$(curl -s http://localhost/active | grep -oP '(?<=Active environment: ).*')
+            ACTIVE_ENV=$(curl -s http://localhost/active || echo "Blue")  # 기본값으로 Blue 설정
             echo "Currently active environment: $ACTIVE_ENV"
 
             # Decide which environment to deploy to
@@ -68,17 +68,17 @@ jobs:
             sudo docker-compose pull $TARGET_CONTAINER
             sudo docker-compose up -d $TARGET_CONTAINER
 
-            # Update nginx configuration
+            # Update nginx configuration by copying the appropriate config file
             if [ "$TARGET_ENV" == "Green" ]; then
-              sudo sed -i 's/web_blue:8080/web_green:8080/' /etc/nginx/conf.d/nginx.conf
+              sudo cp /etc/nginx/conf.d/nginx-green.conf /etc/nginx/conf.d/nginx.conf
             else
-              sudo sed -i 's/web_green:8080/web_blue:8080/' /etc/nginx/conf.d/nginx.conf
+              sudo cp /etc/nginx/conf.d/nginx-blue.conf /etc/nginx/conf.d/nginx.conf
             fi
 
             # Reload nginx to apply the new configuration
             sudo docker exec nginx nginx -s reload
 
-      - name: Health Check for Green deployment
+      - name: Health Check for Deployment
         run: |
           sleep 10  # Give it some time to start
           DEPLOYMENT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$TARGET_PORT/health)
