@@ -36,14 +36,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Make application.yml
-        run: |
-          cd ./src/main
-          mkdir resources
-          cd ./resources
-          touch ./application.yml
-          echo "$APPLICATION" > ./application.yml
-
       - name: Gradle 권한 부여
         run: chmod +x gradlew
 
