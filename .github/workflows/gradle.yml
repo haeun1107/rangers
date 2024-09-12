@@ -68,14 +68,14 @@ jobs:
         run: |
           aws s3 cp \
           --region ap-northeast-2 \
-          ./spring-build.zip s3://backend-rex-bucket
+          ./spring-build.zip s3://cocofarm-bucket
 
       # CodeDelploy에 배포를 요청합니다.
       - name: Code Deploy 배포 요청
         run: aws deploy create-deployment --application-name cocofarm-app
           --deployment-config-name CodeDeployDefault.OneAtATime
           --deployment-group-name cocofarm-app
-          --s3-location bucket=backend-rex-bucket,bundleType=zip,key=spring-build.zip
+          --s3-location bucket=cocofarm-bucket,bundleType=zip,key=spring-build.zip
 
       # 빌드 성공 & 실패 여부를 Slack 알람으로 발송합니다.
 #      - name: Slack 알람 발송
