@@ -21,13 +21,6 @@ permissions:
 
 # Deploy 전후에 실행할 스크립트 또는 명령에 관련된 설정
 hooks:
-  # 파일을 먼저 복사
-  BeforeInstall:
-    - location: /bin/cp -R /opt/codedeploy-agent/deployment-root/* /home/ec2-user/app
-      timeout: 60
-      runas: ec2-user
-
-  # 그 후에 스크립트를 실행
   AfterInstall:
     - location: /home/ec2-user/app/deploy.sh
       timeout: 60
