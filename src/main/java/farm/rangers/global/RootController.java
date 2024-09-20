@@ -5,12 +5,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/")
 public class RootController {
 
-    @GetMapping
+    @GetMapping("/")
     public String hc() {
         return "success!";
+    }
+
+    @GetMapping("/haeun")
+    public String haeun() {
+        return "haeun~~!";
     }
 }
 
