@@ -1,6 +1,4 @@
 spring:
-  config:
-    import: optional:file:.env
   datasource:
     url: ${RDS_HOST}
     username: ${DB_USER}
