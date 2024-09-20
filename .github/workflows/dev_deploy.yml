@@ -39,7 +39,7 @@ jobs:
       - name: Generate deployment package
         run: |
           mkdir -p deploy
-          cp build/libs/aecofarm-0.0.1-SNAPSHOT.jar deploy/application.jar
+          cp build/libs/rangers-0.0.1-SNAPSHOT.jar deploy/application.jar
           if [ ! -f deploy/application.jar ]; then
             echo "JAR file not found, build failed."
             exit 1
