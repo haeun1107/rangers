@@ -19,7 +19,7 @@ public class RootController {
 
     @GetMapping("/cocofarm")
     public String cocofarm() {
-        return "cocofarm!!";
+        return "cocofarm이다!!";
     }
 }
 
