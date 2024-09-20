@@ -14,7 +14,12 @@ public class RootController {
 
     @GetMapping("/haeun")
     public String haeun() {
-        return "haeun~~!";
+        return "haeun입니다!";
+    }
+
+    @GetMapping("/cocofarm")
+    public String cocofarm() {
+        return "cocofarm!!";
     }
 }
 
