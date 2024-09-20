@@ -40,7 +40,10 @@ jobs:
 
       - name: Gradle로 빌드 실행
         run: ./gradlew bootjar
-
+        env:
+          RDS_HOST: ${{ secrets.RDS_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       # 배포에 필요한 여러 설정 파일과 프로젝트 빌드파일을 zip 파일로 모아줍니다.
       - name: zip file 생성

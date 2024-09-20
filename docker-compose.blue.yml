@@ -10,3 +10,8 @@ services:
       - "8081:8080"
     # 컨테이너의 이름
     container_name: spring-blue
+
+    environment:
+      - RDS_HOST=${RDS_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
